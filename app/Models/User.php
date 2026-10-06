@@ -82,6 +82,11 @@ class User extends Authenticatable
         return in_array($this->role, [self::ROLE_VENDOR_ADMIN, self::ROLE_VENDOR_STAFF], true);
     }
 
+    public function client(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active';

@@ -66,12 +66,11 @@ export default function AuthenticatedLayout({ header, children }) {
                     available: true,
                 },
                 {
-                    name: 'Clients',
-                    href: '#',
-                    active: false,
+                    name: isClientAdmin ? 'My Office' : 'Clients',
+                    href: isClientAdmin && user?.client_id ? route('clients.show', user.client_id) : route('clients.index'),
+                    active: route().current('clients.*'),
                     icon: Building2,
-                    badge: 'M2',
-                    available: false,
+                    available: isVendorAdmin || isVendorStaff || (isClientAdmin && !!user?.client_id),
                 },
                 {
                     name: 'Employees',
@@ -517,19 +516,17 @@ export default function AuthenticatedLayout({ header, children }) {
                         <span className="text-[10px] mt-1">Dashboard</span>
                     </Link>
 
-                    {(isVendorAdmin || isVendorStaff) && (
-                        <Link
-                            href={route('vendor.profile')}
-                            className={`flex flex-col items-center justify-center py-1 transition-colors ${
-                                route().current('vendor.profile')
+                    <Link
+                        href={isClientAdmin && user?.client_id ? route('clients.show', user.client_id) : route('clients.index')}
+                        className={`flex flex-col items-center justify-center py-1 transition-colors ${
+                            route().current('clients.*')
                                 ? 'text-emerald-600 font-bold'
                                 : 'text-slate-500 hover:text-slate-900'
-                            }`}
-                        >
-                            <Store className="h-5 w-5" />
-                            <span className="text-[10px] mt-1">Vendor</span>
-                        </Link>
-                    )}
+                        }`}
+                    >
+                        <Building2 className="h-5 w-5" />
+                        <span className="text-[10px] mt-1">{isClientAdmin ? 'Office' : 'Clients'}</span>
+                    </Link>
 
                     <Link
                         href={route('profile.edit')}

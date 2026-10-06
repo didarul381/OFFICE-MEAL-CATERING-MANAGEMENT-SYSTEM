@@ -158,9 +158,21 @@ export default function Dashboard({ stats, clientOverview, vendor, role }) {
                                     <tbody className="divide-y divide-slate-100 font-medium">
                                         {clientOverview?.map((client, idx) => (
                                             <tr key={idx} className="hover:bg-slate-50/70 transition-colors">
-                                                <td className="px-6 py-4 font-bold text-slate-900 flex items-center gap-2">
-                                                    <Building2 className="h-4 w-4 text-slate-400" />
-                                                    <span>{client.name}</span>
+                                                <td className="px-6 py-4 font-bold text-slate-900">
+                                                    {client.id ? (
+                                                        <Link
+                                                            href={route('clients.show', client.id)}
+                                                            className="flex items-center gap-2 hover:text-emerald-700 transition-colors"
+                                                        >
+                                                            <Building2 className="h-4 w-4 text-slate-400" />
+                                                            <span>{client.name}</span>
+                                                        </Link>
+                                                    ) : (
+                                                        <div className="flex items-center gap-2">
+                                                            <Building2 className="h-4 w-4 text-slate-400" />
+                                                            <span>{client.name}</span>
+                                                        </div>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4">{client.employees} Staff</td>
                                                 <td className="px-6 py-4 font-bold text-emerald-700">
