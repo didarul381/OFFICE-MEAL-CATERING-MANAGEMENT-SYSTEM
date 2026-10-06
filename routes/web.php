@@ -3,10 +3,13 @@
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientPricingController;
 use App\Http\Controllers\ClientUserController;
+use App\Http\Controllers\DailyMealController;
 use App\Http\Controllers\DailyMenuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmployeeImportController;
+use App\Http\Controllers\MealCalendarController;
+use App\Http\Controllers\MealHistoryController;
 use App\Http\Controllers\MenuItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VendorProfileController;
@@ -60,6 +63,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/daily-menus/{daily_menu}/duplicate', [DailyMenuController::class, 'duplicate'])
         ->name('daily-menus.duplicate');
     Route::resource('daily-menus', DailyMenuController::class);
+
+    // Milestone 05: Daily Meal Management
+    Route::get('/daily-meals', [DailyMealController::class, 'index'])
+        ->name('daily-meals.index');
+    Route::get('/daily-meals/roster', [DailyMealController::class, 'roster'])
+        ->name('daily-meals.roster');
+    Route::post('/daily-meals/roster', [DailyMealController::class, 'store'])
+        ->name('daily-meals.store');
+    Route::get('/daily-meals/history', [MealHistoryController::class, 'index'])
+        ->name('daily-meals.history');
+    Route::get('/daily-meals/calendar', [MealCalendarController::class, 'index'])
+        ->name('daily-meals.calendar');
 
     // Vendor Profile Management (Vendor Admin full edit, Vendor Staff view)
     Route::get('/vendor/profile', [VendorProfileController::class, 'edit'])

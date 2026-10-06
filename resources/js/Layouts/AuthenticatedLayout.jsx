@@ -104,11 +104,10 @@ export default function AuthenticatedLayout({ header, children }) {
                 },
                 {
                     name: 'Daily Meals',
-                    href: '#',
-                    active: false,
+                    href: isClientAdmin && user?.client_id ? route('daily-meals.roster') : route('daily-meals.index'),
+                    active: route().current('daily-meals.*'),
                     icon: CalendarCheck,
-                    badge: 'M5',
-                    available: false,
+                    available: isVendorAdmin || isVendorStaff || (isClientAdmin && !!user?.client_id),
                 },
                 {
                     name: 'Orders & Riders',

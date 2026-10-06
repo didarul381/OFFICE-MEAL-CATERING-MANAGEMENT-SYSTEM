@@ -75,6 +75,22 @@ class Client extends Model
     }
 
     /**
+     * Daily meal entries for enrolled employees of this client.
+     */
+    public function mealEntries(): HasMany
+    {
+        return $this->hasMany(MealEntry::class);
+    }
+
+    /**
+     * Daily meal confirmation summaries for this client.
+     */
+    public function mealConfirmations(): HasMany
+    {
+        return $this->hasMany(DailyMealConfirmation::class);
+    }
+
+    /**
      * Sync and update the headcount based on enrolled employees.
      */
     public function syncEmployeeCount(): void

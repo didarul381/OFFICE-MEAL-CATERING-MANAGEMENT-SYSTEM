@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Employee extends Model
@@ -51,6 +52,14 @@ class Employee extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    /**
+     * Relationship to meal entries consumed by this employee.
+     */
+    public function mealEntries(): HasMany
+    {
+        return $this->hasMany(MealEntry::class);
     }
 
     /**
@@ -125,5 +134,21 @@ class Employee extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');
+    }
+
+    /**
+     * Accessor for is_active.
+     */
+    public function getIsActiveAttribute(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    /**
+     * Mutator for is_active.
+     */
+    public function setIsActiveAttribute($value): void
+    {
+        $this->attributes['status'] = $value ? 'active' : 'inactive';
     }
 }

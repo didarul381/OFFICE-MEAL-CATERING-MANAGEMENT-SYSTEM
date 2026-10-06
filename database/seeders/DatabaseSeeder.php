@@ -6,7 +6,9 @@ use App\Models\Client;
 use App\Models\ClientMenuPrice;
 use App\Models\DailyMenu;
 use App\Models\DailyMenuItem;
+use App\Models\DailyMealConfirmation;
 use App\Models\Employee;
+use App\Models\MealEntry;
 use App\Models\MenuItem;
 use App\Models\User;
 use App\Models\VendorProfile;
@@ -460,6 +462,114 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         }
+
+        // 7. Seed Meal Entries (Milestone 05)
+        // Seed lunch for XYZ Software Ltd. employees for today
+        $xyzEmployees = Employee::where('client_id', $client1->id)->get();
+        $lunchCount1 = 0;
+        foreach ($xyzEmployees as $emp) {
+            if ($emp->lunch_enabled) {
+                $lunchCount1++;
+                MealEntry::updateOrCreate(
+                    [
+                        'employee_id' => $emp->id,
+                        'date' => $today,
+                        'meal_type' => 'Lunch',
+                    ],
+                    [
+                        'client_id' => $client1->id,
+                        'status' => 'consumed',
+                        'unit_price' => 120.00,
+                        'total_price' => 120.00,
+                    ]
+                );
+            }
+        }
+
+        DailyMealConfirmation::updateOrCreate(
+            [
+                'client_id' => $client1->id,
+                'date' => $today,
+                'meal_type' => 'Lunch',
+            ],
+            [
+                'total_count' => $lunchCount1,
+                'unit_price' => 120.00,
+                'total_amount' => $lunchCount1 * 120.00,
+                'status' => 'confirmed',
+                'confirmed_at' => now(),
+            ]
+        );
+
+        // Seed lunch & dinner for ABC Bank Ltd. for yesterday
+        $bankEmployees = Employee::where('client_id', $client2->id)->get();
+        $lunchCount2 = 0;
+        $dinnerCount2 = 0;
+        foreach ($bankEmployees as $emp) {
+            if ($emp->lunch_enabled) {
+                $lunchCount2++;
+                MealEntry::updateOrCreate(
+                    [
+                        'employee_id' => $emp->id,
+                        'date' => $yesterday,
+                        'meal_type' => 'Lunch',
+                    ],
+                    [
+                        'client_id' => $client2->id,
+                        'status' => 'consumed',
+                        'unit_price' => 130.00,
+                        'total_price' => 130.00,
+                    ]
+                );
+            }
+
+            if ($emp->dinner_enabled) {
+                $dinnerCount2++;
+                MealEntry::updateOrCreate(
+                    [
+                        'employee_id' => $emp->id,
+                        'date' => $yesterday,
+                        'meal_type' => 'Dinner',
+                    ],
+                    [
+                        'client_id' => $client2->id,
+                        'status' => 'consumed',
+                        'unit_price' => 150.00,
+                        'total_price' => 150.00,
+                    ]
+                );
+            }
+        }
+
+        DailyMealConfirmation::updateOrCreate(
+            [
+                'client_id' => $client2->id,
+                'date' => $yesterday,
+                'meal_type' => 'Lunch',
+            ],
+            [
+                'total_count' => $lunchCount2,
+                'unit_price' => 130.00,
+                'total_amount' => $lunchCount2 * 130.00,
+                'status' => 'confirmed',
+                'confirmed_at' => Carbon::yesterday()->setHour(12),
+            ]
+        );
+
+        DailyMealConfirmation::updateOrCreate(
+            [
+                'client_id' => $client2->id,
+                'date' => $yesterday,
+                'meal_type' => 'Dinner',
+            ],
+            [
+                'total_count' => $dinnerCount2,
+                'unit_price' => 150.00,
+                'total_amount' => $dinnerCount2 * 150.00,
+                'status' => 'confirmed',
+                'confirmed_at' => Carbon::yesterday()->setHour(18),
+            ]
+        );
     }
 }
 
