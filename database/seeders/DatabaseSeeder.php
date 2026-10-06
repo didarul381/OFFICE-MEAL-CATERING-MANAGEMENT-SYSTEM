@@ -3,9 +3,14 @@
 namespace Database\Seeders;
 
 use App\Models\Client;
+use App\Models\ClientMenuPrice;
+use App\Models\DailyMenu;
+use App\Models\DailyMenuItem;
 use App\Models\Employee;
+use App\Models\MenuItem;
 use App\Models\User;
 use App\Models\VendorProfile;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -269,5 +274,192 @@ class DatabaseSeeder extends Seeder
 
         $client1->syncEmployeeCount();
         $client2->syncEmployeeCount();
+
+        // 5. Seed Menu Items (Milestone 04)
+        $menuItems = [
+            [
+                'name' => 'Steamed Basmati Rice',
+                'category' => 'Main Course',
+                'description' => 'Aromatic long-grain steamed Basmati rice, freshly prepared.',
+                'default_price' => 40.00,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Shahi Chicken Roast',
+                'category' => 'Protein',
+                'description' => 'Rich and spiced Mughlai style chicken quarter leg roast.',
+                'default_price' => 85.00,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Traditional Beef Bhuna',
+                'category' => 'Protein',
+                'description' => 'Slow-cooked tender beef with aromatic roasted cumin and fried onions.',
+                'default_price' => 110.00,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Rui Fish Curry with Potato',
+                'category' => 'Protein',
+                'description' => 'Fresh Rui fish cut cooked in traditional Bengali mustard-cumin gravy.',
+                'default_price' => 90.00,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Boiled Egg Bhuna',
+                'category' => 'Protein',
+                'description' => 'Golden fried hard-boiled eggs in seasoned onion gravy.',
+                'default_price' => 35.00,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Mixed Seasonal Vegetables (Labra)',
+                'category' => 'Side Dish',
+                'description' => 'Nutritious medley of seasonal vegetables cooked with five-spice temper.',
+                'default_price' => 35.00,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Thick Moong Lentil Dal',
+                'category' => 'Side Dish',
+                'description' => 'Roasted yellow lentil soup tempered with pure ghee, cumin, and dried red chili.',
+                'default_price' => 25.00,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Special Mutton Kacchi Biryani',
+                'category' => 'Main Course',
+                'description' => 'Authentic Old Dhaka style spiced mutton cooked dum with aromatic chinigura rice and fried potato.',
+                'default_price' => 220.00,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Bhuna Khichuri',
+                'category' => 'Main Course',
+                'description' => 'Traditional aromatic spiced rice and moong dal khichuri.',
+                'default_price' => 70.00,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Traditional Borhani',
+                'category' => 'Beverage',
+                'description' => 'Spiced probiotic yogurt drink made with mint, roasted cumin, and black salt.',
+                'default_price' => 40.00,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Sweet Zafrani Firni',
+                'category' => 'Dessert',
+                'description' => 'Creamy ground rice pudding infused with saffron, cardamom, and sliced almonds.',
+                'default_price' => 45.00,
+                'is_active' => true,
+            ],
+        ];
+
+        $createdItems = [];
+        foreach ($menuItems as $item) {
+            $createdItems[$item['name']] = MenuItem::updateOrCreate(
+                ['name' => $item['name']],
+                $item
+            );
+        }
+
+        // Configure contract meal rates for clients
+        $client1->update(['lunch_rate' => 120.00, 'dinner_rate' => 140.00]);
+        $client2->update(['lunch_rate' => 130.00, 'dinner_rate' => 150.00]);
+        $client3->update(['lunch_rate' => 125.00, 'dinner_rate' => 145.00]);
+        $client4->update(['lunch_rate' => 135.00, 'dinner_rate' => 155.00]);
+
+        // Seed custom item override: Client 1 gets Mutton Kacchi Biryani for ৳200 instead of ৳220
+        if (isset($createdItems['Special Mutton Kacchi Biryani'])) {
+            ClientMenuPrice::updateOrCreate(
+                [
+                    'client_id' => $client1->id,
+                    'menu_item_id' => $createdItems['Special Mutton Kacchi Biryani']->id,
+                ],
+                [
+                    'custom_price' => 200.00,
+                    'is_active' => true,
+                ]
+            );
+        }
+
+        // 6. Seed Daily Menus (Today, Yesterday, Tomorrow)
+        $today = Carbon::today()->format('Y-m-d');
+        $yesterday = Carbon::yesterday()->format('Y-m-d');
+        $tomorrow = Carbon::tomorrow()->format('Y-m-d');
+
+        // Today's Standard Lunch Menu (Global)
+        $todayLunch = DailyMenu::updateOrCreate(
+            ['client_id' => null, 'date' => $today, 'meal_type' => 'Lunch'],
+            [
+                'title' => 'Standard Executive Lunch - ' . Carbon::today()->format('M d, Y'),
+                'base_price' => 120.00,
+                'notes' => 'Includes rice, choice of chicken/egg, seasonal labra, and thick lentil dal.',
+                'is_published' => true,
+            ]
+        );
+
+        $lunchItemNames = ['Steamed Basmati Rice', 'Shahi Chicken Roast', 'Mixed Seasonal Vegetables (Labra)', 'Thick Moong Lentil Dal'];
+        $todayLunch->items()->delete();
+        foreach ($lunchItemNames as $idx => $name) {
+            if (isset($createdItems[$name])) {
+                DailyMenuItem::create([
+                    'daily_menu_id' => $todayLunch->id,
+                    'menu_item_id' => $createdItems[$name]->id,
+                    'serving_portion' => $name === 'Shahi Chicken Roast' ? '1 pc (quarter leg)' : 'Standard portion',
+                    'sort_order' => $idx,
+                ]);
+            }
+        }
+
+        // Today's Standard Dinner Menu (Global)
+        $todayDinner = DailyMenu::updateOrCreate(
+            ['client_id' => null, 'date' => $today, 'meal_type' => 'Dinner'],
+            [
+                'title' => 'Executive Dinner - ' . Carbon::today()->format('M d, Y'),
+                'base_price' => 140.00,
+                'notes' => 'Includes steamed rice, tender beef bhuna, dal, and fresh vegetables.',
+                'is_published' => true,
+            ]
+        );
+
+        $dinnerItemNames = ['Steamed Basmati Rice', 'Traditional Beef Bhuna', 'Mixed Seasonal Vegetables (Labra)', 'Thick Moong Lentil Dal'];
+        $todayDinner->items()->delete();
+        foreach ($dinnerItemNames as $idx => $name) {
+            if (isset($createdItems[$name])) {
+                DailyMenuItem::create([
+                    'daily_menu_id' => $todayDinner->id,
+                    'menu_item_id' => $createdItems[$name]->id,
+                    'serving_portion' => 'Standard portion',
+                    'sort_order' => $idx,
+                ]);
+            }
+        }
+
+        // Tomorrow's Special Lunch Menu for XYZ Software Ltd.
+        $tomorrowLunch = DailyMenu::updateOrCreate(
+            ['client_id' => $client1->id, 'date' => $tomorrow, 'meal_type' => 'Lunch'],
+            [
+                'title' => 'Special Feast Lunch for XYZ Software Ltd.',
+                'base_price' => 200.00,
+                'notes' => 'Special company celebration menu: Kacchi Biryani, Borhani, and Firni.',
+                'is_published' => true,
+            ]
+        );
+
+        $specialItems = ['Special Mutton Kacchi Biryani', 'Traditional Borhani', 'Sweet Zafrani Firni'];
+        $tomorrowLunch->items()->delete();
+        foreach ($specialItems as $idx => $name) {
+            if (isset($createdItems[$name])) {
+                DailyMenuItem::create([
+                    'daily_menu_id' => $tomorrowLunch->id,
+                    'menu_item_id' => $createdItems[$name]->id,
+                    'serving_portion' => '1 set',
+                    'sort_order' => $idx,
+                ]);
+            }
+        }
     }
 }
+

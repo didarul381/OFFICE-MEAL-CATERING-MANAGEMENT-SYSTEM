@@ -20,6 +20,8 @@ import {
     Bell,
     ChefHat,
     Calendar,
+    CalendarDays,
+    DollarSign,
 } from 'lucide-react';
 import Badge from '@/Components/Badge';
 import FlashMessage from '@/Components/FlashMessage';
@@ -80,12 +82,25 @@ export default function AuthenticatedLayout({ header, children }) {
                     available: isVendorAdmin || isVendorStaff || (isClientAdmin && !!user?.client_id),
                 },
                 {
-                    name: 'Menu & Pricing',
-                    href: '#',
-                    active: false,
+                    name: 'Food Menu Items',
+                    href: route('menu-items.index'),
+                    active: route().current('menu-items.*'),
                     icon: UtensilsCrossed,
-                    badge: 'M4',
-                    available: false,
+                    available: isVendorAdmin || isVendorStaff || isClientAdmin,
+                },
+                {
+                    name: 'Daily Menus',
+                    href: route('daily-menus.index'),
+                    active: route().current('daily-menus.*'),
+                    icon: CalendarDays,
+                    available: isVendorAdmin || isVendorStaff || isClientAdmin,
+                },
+                {
+                    name: 'Contract Pricing',
+                    href: isClientAdmin && user?.client_id ? route('client-pricing.show', user.client_id) : route('client-pricing.index'),
+                    active: route().current('client-pricing.*'),
+                    icon: DollarSign,
+                    available: isVendorAdmin || isVendorStaff || (isClientAdmin && !!user?.client_id),
                 },
                 {
                     name: 'Daily Meals',

@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ClientPricingController;
 use App\Http\Controllers\ClientUserController;
+use App\Http\Controllers\DailyMenuController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmployeeImportController;
+use App\Http\Controllers\MenuItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VendorProfileController;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +42,24 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('employees', EmployeeController::class);
     Route::post('/employees/{employee}/toggle-status', [EmployeeController::class, 'toggleStatus'])
         ->name('employees.toggle-status');
+
+    // Milestone 04: Menu + Pricing Management
+    Route::post('/menu-items/{menu_item}/toggle-status', [MenuItemController::class, 'toggleStatus'])
+        ->name('menu-items.toggle-status');
+    Route::resource('menu-items', MenuItemController::class);
+
+    Route::get('/client-pricing', [ClientPricingController::class, 'index'])
+        ->name('client-pricing.index');
+    Route::get('/client-pricing/{client}', [ClientPricingController::class, 'show'])
+        ->name('client-pricing.show');
+    Route::get('/client-pricing/{client}/edit', [ClientPricingController::class, 'edit'])
+        ->name('client-pricing.edit');
+    Route::put('/client-pricing/{client}', [ClientPricingController::class, 'update'])
+        ->name('client-pricing.update');
+
+    Route::post('/daily-menus/{daily_menu}/duplicate', [DailyMenuController::class, 'duplicate'])
+        ->name('daily-menus.duplicate');
+    Route::resource('daily-menus', DailyMenuController::class);
 
     // Vendor Profile Management (Vendor Admin full edit, Vendor Staff view)
     Route::get('/vendor/profile', [VendorProfileController::class, 'edit'])

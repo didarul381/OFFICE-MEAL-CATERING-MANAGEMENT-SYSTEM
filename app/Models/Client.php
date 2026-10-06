@@ -25,12 +25,16 @@ class Client extends Model
         'office_start_time',
         'lunch_cutoff_time',
         'dinner_cutoff_time',
+        'lunch_rate',
+        'dinner_rate',
         'special_instructions',
         'status',
         'notes',
     ];
 
     protected $casts = [
+        'lunch_rate' => 'decimal:2',
+        'dinner_rate' => 'decimal:2',
         'meal_types' => 'array',
         'number_of_employees' => 'integer',
         'created_at' => 'datetime',
@@ -52,6 +56,22 @@ class Client extends Model
     public function employees(): HasMany
     {
         return $this->hasMany(Employee::class);
+    }
+
+    /**
+     * Client-specific menu item price overrides.
+     */
+    public function clientMenuPrices(): HasMany
+    {
+        return $this->hasMany(ClientMenuPrice::class);
+    }
+
+    /**
+     * Daily menus customized for this client.
+     */
+    public function dailyMenus(): HasMany
+    {
+        return $this->hasMany(DailyMenu::class);
     }
 
     /**
