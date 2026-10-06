@@ -160,6 +160,8 @@ class EmployeeImportController extends Controller
                 $lunchEnabled = in_array(strtolower($row['lunch_enabled'] ?? '1'), ['1', 'true', 'yes'], true);
                 $dinnerEnabled = in_array(strtolower($row['dinner_enabled'] ?? '0'), ['1', 'true', 'yes'], true);
 
+                $isDuplicate = false;
+
                 // Validation 1: Missing employee name
                 if (empty($name)) {
                     $rowErrors[] = 'Missing employee name';
@@ -172,10 +174,15 @@ class EmployeeImportController extends Controller
                     $normalizedEmpId = strtolower($employeeId);
                     if (in_array($normalizedEmpId, $existingEmployeeIds, true) || in_array($normalizedEmpId, $seenInFile, true)) {
                         $duplicates++;
-                        $rowErrors[] = "Duplicate employee ID '{$employeeId}' for this organization";
+                        $isDuplicate = true;
+                        $errors[] = "Row {$rowNumber} (" . ($name ?: 'Unnamed') . "): Duplicate employee ID '{$employeeId}' for this organization";
                     } else {
                         $seenInFile[] = $normalizedEmpId;
                     }
+                }
+
+                if ($isDuplicate) {
+                    continue;
                 }
 
                 // Validation 3: Invalid Phone (if provided)

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Client;
+use App\Models\Employee;
 use App\Models\User;
 use App\Models\VendorProfile;
 use Illuminate\Database\Seeder;
@@ -159,5 +160,114 @@ class DatabaseSeeder extends Seeder
                 $userData
             );
         }
+
+        // 4. Seed Foundational Employees for XYZ Software Ltd. (Milestone 03)
+        $employeesXyz = [
+            [
+                'name' => 'Abdullah Al Mamun',
+                'employee_id' => 'XYZ-101',
+                'phone' => '+880 1711-200101',
+                'email' => 'mamun@xyzsoftware.com',
+                'department' => 'Engineering',
+                'designation' => 'Principal Software Architect',
+                'meal_preference' => 'Standard',
+                'lunch_enabled' => true,
+                'dinner_enabled' => false,
+                'joining_date' => '2023-01-15',
+            ],
+            [
+                'name' => 'Fatima Tuz Zohra',
+                'employee_id' => 'XYZ-102',
+                'phone' => '+880 1711-200102',
+                'email' => 'fatima@xyzsoftware.com',
+                'department' => 'Product Design',
+                'designation' => 'Lead UX Researcher',
+                'meal_preference' => 'Vegetarian',
+                'lunch_enabled' => true,
+                'dinner_enabled' => false,
+                'joining_date' => '2023-04-10',
+            ],
+            [
+                'name' => 'Shahriar Kabir',
+                'employee_id' => 'XYZ-103',
+                'phone' => '+880 1711-200103',
+                'email' => 'shahriar@xyzsoftware.com',
+                'department' => 'Engineering',
+                'designation' => 'Senior Backend Engineer',
+                'meal_preference' => 'Non-Veg',
+                'lunch_enabled' => true,
+                'dinner_enabled' => true,
+                'joining_date' => '2023-06-01',
+            ],
+            [
+                'name' => 'Nusrat Jahan',
+                'employee_id' => 'XYZ-104',
+                'phone' => '+880 1711-200104',
+                'email' => 'nusrat@xyzsoftware.com',
+                'department' => 'Quality Assurance',
+                'designation' => 'QA Automation Lead',
+                'meal_preference' => 'Standard',
+                'lunch_enabled' => true,
+                'dinner_enabled' => false,
+                'joining_date' => '2024-02-12',
+            ],
+            [
+                'name' => 'Tariqul Hasan',
+                'employee_id' => 'XYZ-105',
+                'phone' => '+880 1711-200105',
+                'email' => 'tariq@xyzsoftware.com',
+                'department' => 'DevOps',
+                'designation' => 'Site Reliability Engineer',
+                'meal_preference' => 'No Beef',
+                'lunch_enabled' => true,
+                'dinner_enabled' => true,
+                'joining_date' => '2024-05-18',
+            ],
+        ];
+
+        foreach ($employeesXyz as $empData) {
+            Employee::updateOrCreate(
+                ['client_id' => $client1->id, 'employee_id' => $empData['employee_id']],
+                array_merge($empData, ['client_id' => $client1->id, 'status' => 'active'])
+            );
+        }
+
+        // Seed Employees for ABC Bank Ltd.
+        $employeesBank = [
+            [
+                'name' => 'Mahbubur Rahman',
+                'employee_id' => 'BNK-201',
+                'phone' => '+880 1811-300201',
+                'email' => 'mahbub@abcbank.com',
+                'department' => 'Branch Banking',
+                'designation' => 'Senior Officer',
+                'meal_preference' => 'Standard',
+                'lunch_enabled' => true,
+                'dinner_enabled' => true,
+                'joining_date' => '2022-08-01',
+            ],
+            [
+                'name' => 'Nazneen Akter',
+                'employee_id' => 'BNK-202',
+                'phone' => '+880 1811-300202',
+                'email' => 'nazneen@abcbank.com',
+                'department' => 'Foreign Exchange',
+                'designation' => 'Assistant Vice President',
+                'meal_preference' => 'Vegetarian',
+                'lunch_enabled' => true,
+                'dinner_enabled' => false,
+                'joining_date' => '2021-11-15',
+            ],
+        ];
+
+        foreach ($employeesBank as $empData) {
+            Employee::updateOrCreate(
+                ['client_id' => $client2->id, 'employee_id' => $empData['employee_id']],
+                array_merge($empData, ['client_id' => $client2->id, 'status' => 'active'])
+            );
+        }
+
+        $client1->syncEmployeeCount();
+        $client2->syncEmployeeCount();
     }
 }

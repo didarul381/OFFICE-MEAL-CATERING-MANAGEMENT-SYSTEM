@@ -74,11 +74,10 @@ export default function AuthenticatedLayout({ header, children }) {
                 },
                 {
                     name: 'Employees',
-                    href: '#',
-                    active: false,
+                    href: route('employees.index'),
+                    active: route().current('employees.*'),
                     icon: Users,
-                    badge: 'M3',
-                    available: false,
+                    available: isVendorAdmin || isVendorStaff || (isClientAdmin && !!user?.client_id),
                 },
                 {
                     name: 'Menu & Pricing',
